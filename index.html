@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>懲戒・判例モニター</title>
+<style>
+:root{
+  --ink:#1a2433; --muted:#5b6778; --line:#d8dee7; --bg:#f2f4f7; --card:#fff;
+  --navy:#244a7c; --brick:#8c3a2d; --slate:#4f6272; --amber:#a86a00; --new:#b3261e;
+  --radius:10px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Meiryo UI","Yu Gothic UI","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+  font-size:15px;line-height:1.65}
+button,select,input{font:inherit;color:inherit}
+a{color:var(--navy)}
+:focus-visible{outline:3px solid #7aa7e0;outline-offset:2px}
+
+.top{background:#fff;border-bottom:1px solid var(--line)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+.top .wrap{display:flex;align-items:center;gap:16px;min-height:64px;flex-wrap:wrap;padding-top:8px;padding-bottom:8px}
+.brand{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:700;white-space:nowrap}
+.mark{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:8px;background:var(--navy);color:#fff;font-size:18px}
+.meta{color:var(--muted);font-size:13px;flex:1;min-width:220px}
+.acct{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+.linkbtn{background:none;border:0;padding:2px 4px;color:var(--navy);text-decoration:underline;cursor:pointer}
+
+main.wrap{padding-top:20px;padding-bottom:60px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin-bottom:18px}
+.panel h2{margin:0 0 12px;font-size:17px}
+.hint{color:var(--muted);font-size:13px;margin:8px 0 0}
+
+.center{max-width:560px;margin:60px auto;text-align:center}
+.center h1{font-size:22px;margin:0 0 10px}
+.center p{color:var(--muted);margin:0 0 20px}
+.btn{display:inline-block;background:var(--navy);color:#fff;border:0;border-radius:8px;padding:10px 20px;cursor:pointer;font-weight:700}
+.btn:hover{background:#1c3b66}
+.btn.ghost{background:#fff;color:var(--navy);border:1px solid var(--navy)}
+.btn.ghost:hover{background:#eef3fa}
+.err{border-left:5px solid var(--new);text-align:left}
+
+.alert{display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:#fff;border:2px solid var(--line);border-radius:var(--radius);padding:14px 20px;margin-bottom:18px}
+.alert.on{border-color:var(--new)}
+.alert .big{font-size:20px;font-weight:700}
+.alert.on .big{color:var(--new)}
+.alert .txt{color:var(--muted);flex:1;min-width:200px}
+.alert .btn{background:var(--new)}
+.alert:not(.on) .btn{display:none}
+.alert .btn[aria-pressed="true"]{background:#fff;color:var(--new);border:1px solid var(--new)}
+
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.tile{text-align:left;background:#fff;border:2px solid var(--c,var(--line));border-radius:var(--radius);padding:12px 16px;cursor:pointer}
+.tile .n{font-size:30px;font-weight:700;line-height:1.2}
+.tile .k{font-weight:700;color:var(--c)}
+.tile .s{font-size:12px;color:var(--muted)}
+.tile[aria-pressed="false"]{border-style:dashed;border-color:var(--line);background:#fafbfc}
+.tile[aria-pressed="false"] .k,.tile[aria-pressed="false"] .n{color:#9aa4b2}
+.tile[data-k="懲戒事例"]{--c:var(--brick)}
+.tile[data-k="裁判例・判例"]{--c:var(--navy)}
+.tile[data-k="参考情報"]{--c:var(--slate)}
+.tile:not([data-k="懲戒事例"]):not([data-k="裁判例・判例"]):not([data-k="参考情報"]){--c:var(--amber)}
+
+.filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:18px;align-items:end}
+.filters label{display:block;font-size:12px;color:var(--muted);margin-bottom:2px}
+.filters select,.filters input[type=search]{width:100%;height:38px;border:1px solid #b9c2cf;border-radius:6px;padding:0 8px;background:#fff}
+.chk{display:flex;align-items:center;gap:6px;height:38px;font-size:14px}
+.reset{margin-top:10px}
+
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:28px;margin-top:22px}
+.charts h3{font-size:14px;margin:0 0 8px}
+.bar{display:grid;grid-template-columns:150px 1fr 34px;gap:10px;align-items:center;width:100%;background:none;border:0;padding:3px 4px;border-radius:6px;cursor:pointer;text-align:left}
+.bar:hover{background:#f2f5f9}
+.bar[aria-pressed="true"]{background:#e6eefa}
+.bar .l{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+.bar .t{height:10px;background:#e6eaf0;border-radius:5px;overflow:hidden}
+.bar .t i{display:block;height:100%;background:var(--navy);border-radius:5px}
+.bar .v{text-align:right;font-size:13px}
+
+.listhead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.listhead h2{margin:0}
+.listhead label{font-size:13px;color:var(--muted)}
+.listhead select{height:34px;border:1px solid #b9c2cf;border-radius:6px;padding:0 8px;background:#fff;margin-left:6px}
+
+.card{display:block;background:#fff;border:1px solid var(--line);border-left:6px solid var(--c,var(--slate));border-radius:var(--radius);padding:14px 18px;margin-bottom:12px;cursor:pointer}
+.card:hover{border-color:#aebbd0;border-left-color:var(--c)}
+.card[data-k="懲戒事例"]{--c:var(--brick)}
+.card[data-k="裁判例・判例"]{--c:var(--navy)}
+.card[data-k="参考情報"]{--c:var(--slate)}
+.tags{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:12px}
+.tag{border-radius:4px;padding:1px 8px;font-weight:700;color:#fff;background:var(--c,var(--slate))}
+.tag.new{background:var(--new)}
+.tag.upd{background:#2f6f4e}
+.chip{border:1px solid #9aa6b6;border-radius:4px;padding:0 7px;color:var(--ink);background:#fff}
+.chip.hi{background:var(--ink);border-color:var(--ink);color:#fff}
+.chip.plain{border-color:transparent;color:var(--muted);padding:0}
+.card h3{margin:6px 0 2px;font-size:17px}
+.card .sum{margin:0;color:#2e3a4b;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.card .info{display:flex;flex-wrap:wrap;gap:4px 22px;margin-top:8px;font-size:13px;color:var(--muted)}
+.empty{text-align:center;color:var(--muted);padding:30px 0}
+
+dialog{width:min(860px,94vw);max-height:90vh;border:0;border-radius:12px;padding:0;color:var(--ink)}
+dialog::backdrop{background:rgba(20,28,40,.5)}
+.dhead{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line);padding:14px 22px;display:flex;gap:12px;align-items:flex-start;justify-content:space-between}
+.dhead h2{margin:4px 0 0;font-size:20px}
+.dbody{padding:6px 22px 24px}
+.sec{margin-top:16px}
+.sec h4{margin:0 0 4px;font-size:13px;color:var(--muted)}
+.sec p{margin:0;white-space:pre-wrap;word-break:break-word}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 14px;font-size:14px}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;word-break:break-word}
+.rel{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+
+@media (max-width:640px){
+  .wrap{padding:0 12px}
+  .panel{padding:16px 14px}
+  .bar{grid-template-columns:110px 1fr 30px}
+  .kv{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><span class="mark" aria-hidden="true">懲</span>懲戒・判例モニター</div>
+    <div class="meta" id="meta"></div>
+    <div class="acct">
+      <span id="acct"></span>
+      <button class="linkbtn" id="reload" type="button" hidden>再読み込み</button>
+      <button class="linkbtn" id="signout" type="button" hidden>切替え</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <noscript><div class="panel err">この画面は JavaScript が必要です。</div></noscript>
+
+  <section id="view-gate" class="center" hidden>
+    <h1>Microsoft アカウントでサインインしてください</h1>
+    <p>サインインすると、OneDrive の「懲戒」フォルダーにある最新の Excel を読み込んで表示します。閲覧のみで、Excel は変更しません。</p>
+    <button class="btn" id="signin" type="button">Microsoft でサインイン</button>
+  </section>
+
+  <section id="view-loading" class="center" hidden>
+    <p id="loading-text">読み込んでいます…</p>
+  </section>
+
+  <section id="view-error" class="panel err" hidden>
+    <h2>読み込めませんでした</h2>
+    <p id="error-text"></p>
+    <button class="btn ghost" id="retry" type="button">もう一度読み込む</button>
+  </section>
+
+  <div id="view-app" hidden>
+    <section class="alert" id="alert">
+      <span class="big" id="alert-big"></span>
+      <span class="txt" id="alert-txt"></span>
+      <button class="btn" id="only-new" type="button" aria-pressed="false">新着・更新だけ表示</button>
+    </section>
+
+    <section class="panel">
+      <h2>サマリー</h2>
+      <div class="tiles" id="tiles"></div>
+      <p class="hint">区分の四角を押すと、表示する・しないを切り替えられます。</p>
+
+      <div class="filters">
+        <div><label for="f-impact">自動車販売・整備会社への影響度</label><select id="f-impact"></select></div>
+        <div><label for="f-imp">コンプライアンス重要度</label><select id="f-imp"></select></div>
+        <div><label for="f-industry">業種</label><select id="f-industry"></select></div>
+        <div><label for="f-follow">続報区分</label><select id="f-follow"></select></div>
+        <div><label for="f-kw">キーワード</label><input id="f-kw" type="search" placeholder="例：懲戒解雇、整備士"></div>
+        <label class="chk"><input id="f-new" type="checkbox">新着・更新のみ</label>
+      </div>
+      <div class="reset"><button class="linkbtn" id="reset" type="button">絞り込みを元に戻す</button></div>
+
+      <div class="charts">
+        <div><h3>業種別</h3><div id="chart-industry"></div></div>
+        <div><h3>情報の種類別（一次／二次）</h3><div id="chart-source"></div></div>
+      </div>
+      <p class="hint">棒を押すと、その項目で絞り込みます（もう一度押すと解除）。</p>
+    </section>
+
+    <section class="panel">
+      <div class="listhead">
+        <h2 id="list-title">案件一覧</h2>
+        <label>並び順
+          <select id="sort">
+            <option value="reg">登録が新しい順</option>
+            <option value="occ">発生日／判決日が新しい順</option>
+            <option value="imp">重要度が高い順</option>
+          </select>
+        </label>
+      </div>
+      <div id="list"></div>
+    </section>
+  </div>
+</main>
+
+<dialog id="dlg" aria-labelledby="dlg-title">
+  <div class="dhead">
+    <div>
+      <div class="tags" id="dlg-tags"></div>
+      <h2 id="dlg-title"></h2>
+    </div>
+    <button class="btn ghost" id="dlg-close" type="button">閉じる</button>
+  </div>
+  <div class="dbody" id="dlg-body"></div>
+</dialog>
+
+<script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@2.38.3/lib/msal-browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+(function () {
+'use strict';
+
+/* ---------- 設定 ---------- */
+const CLIENT_ID = '87304e46-e088-459f-8220-9471c7c09dae';
+const TENANT_ID = '9a479428-f83e-4a2e-b0f7-0fdac44a610d';
+const REDIRECT  = 'https://mt-hcg.github.io/chokai-portal/';
+const FOLDER    = '懲戒';
+const SHEET     = '懲戒・判例一覧';
+const SCOPES    = ['User.Read', 'Files.Read'];
+const KUBUN_ORDER = ['懲戒事例', '裁判例・判例', '参考情報'];
+
+/* ---------- 小さな道具 ---------- */
+const $ = (s, r) => (r || document).querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g,
+  c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const pad = n => String(n).padStart(2, '0');
+const norm = s => String(s == null ? '' : s).normalize('NFKC').toLowerCase();
+const has = v => v !== null && v !== undefined && String(v).trim() !== '';
+
+class AppError extends Error { constructor(msg, status) { super(msg); this.status = status; } }
+
+/* ---------- 日付 ---------- */
+function parseDate(v) {
+  if (v == null || v === '') return null;
+  if (v instanceof Date && !isNaN(v)) {
+    const t = new Date(v.getTime() + 30000);
+    return { y: t.getFullYear(), m: t.getMonth() + 1, d: t.getDate(), h: t.getHours(), mi: t.getMinutes() };
+  }
+  if (typeof v === 'string') {
+    const m = v.match(/(\d{4})[\/\-年.](\d{1,2})[\/\-月.](\d{1,2})/);
+    if (m) {
+      const t = v.match(/(\d{1,2}):(\d{2})/);
+      return { y: +m[1], m: +m[2], d: +m[3], h: t ? +t[1] : 0, mi: t ? +t[2] : 0 };
+    }
+  }
+  return null;
+}
+const dayKey = p => p ? p.y * 10000 + p.m * 100 + p.d : 0;
+const dayText = p => p ? `${p.y}/${pad(p.m)}/${pad(p.d)}` : '';
+function fmtDay(v) {
+  if (v instanceof Date) return dayText(parseDate(v));
+  if (typeof v === 'string' && /^\s*\d{4}[\/\-]\d{1,2}[\/\-]\d{1,2}(\s+\d{1,2}:\d{2}(:\d{2})?)?\s*$/.test(v)) return dayText(parseDate(v));
+  return has(v) ? String(v).trim() : '';
+}
+function fmtDayTime(v) {
+  const p = parseDate(v);
+  if (!p) return has(v) ? String(v).trim() : '';
+  return `${dayText(p)} ${pad(p.h)}:${pad(p.mi)}`;
+}
+function idDate(id) {
+  const m = String(id).match(/-(\d{4})(\d{2})(\d{2})-/);
+  return m ? { y: +m[1], m: +m[2], d: +m[3], h: 0, mi: 0 } : null;
+}
+
+/* ---------- 正規化 ---------- */
+function normKubun(v) {
+  const s = has(v) ? String(v).trim() : '';
+  if (s.startsWith('懲戒')) return '懲戒事例';
+  if (s.includes('裁判') || s.includes('判例')) return '裁判例・判例';
+  if (s.includes('参考')) return '参考情報';
+  return s || '未分類';
+}
+function normIndustry(v) {
+  const s = has(v) ? String(v).trim() : '';
+  if (!s) return '未記載';
+  if (/ディーラー|自動車販売/.test(s)) return 'ディーラー・自動車販売';
+  if (/メーカー/.test(s)) return '自動車メーカー';
+  if (/タクシー|バス|旅客/.test(s)) return '旅客運送（タクシー・バス）';
+  if (/貨物/.test(s)) return '貨物運送';
+  if (/部品|用品/.test(s)) return '部品・用品';
+  if (/整備/.test(s)) return '整備';
+  return s;
+}
+function normSource(v) {
+  const s = has(v) ? String(v).trim() : '';
+  if (!s) return '未記載';
+  if (s.includes('＋') || s.includes('+')) return '一次・二次の両方';
+  if (s.startsWith('一次')) return '一次情報';
+  if (s.includes('二次')) return '二次情報';
+  return s;
+}
+const levelRank = v => ({ '高': 0, '中': 1, '低': 2 }[String(v || '').trim()] ?? 3);
+
+/* ---------- データ ---------- */
+const state = {
+  cases: [], base: null, meta: {}, hidden: new Set(),
+  f: { impact: '', imp: '', industry: '', follow: '', kw: '', onlyNew: false, source: '' },
+  sort: 'reg'
+};
+
+function toCase(r) {
+  const g = k => (has(r[k]) || r[k] instanceof Date || typeof r[k] === 'number') ? r[k] : null;
+  const id = String(g('管理ID') || '').trim();
+  const reg = parseDate(r['初回登録日時']) || idDate(id);
+  const last = parseDate(r['最終確認日時']);
+  const occ = parseDate(r['発生日／判決日']);
+  const c = {
+    raw: r, id,
+    kubun: normKubun(r['区分']),
+    impact: has(r['自動車販売・整備会社への影響度']) ? String(r['自動車販売・整備会社への影響度']).trim() : '',
+    imp: has(r['コンプライアンス重要度']) ? String(r['コンプライアンス重要度']).trim() : '',
+    org: g('企業・組織名') || '（名称未記載）',
+    industry: normIndustry(r['業種']),
+    source: normSource(r['一次／二次情報']),
+    follow: has(r['続報区分']) ? String(r['続報区分']).trim() : '',
+    parent: has(r['親管理ID']) ? String(r['親管理ID']).trim() : '',
+    regKey: dayKey(reg), lastKey: dayKey(last), occKey: dayKey(occ),
+    isNew: false, isUpd: false
+  };
+  c.text = norm(Object.values(r).map(v => v instanceof Date ? fmtDayTime(v) : v).filter(has).join(' '));
+  return c;
+}
+
+function markNewUpdated() {
+  const b = state.base;
+  state.cases.forEach(c => {
+    c.isNew = b > 0 && c.regKey === b;
+    c.isUpd = b > 0 && !c.isNew && c.lastKey === b;
+  });
+}
+
+/* ---------- 絞り込み・並び替え ---------- */
+function passes(c, skip) {
+  const f = state.f;
+  if (state.hidden.has(c.kubun)) return false;
+  if (skip !== 'impact' && f.impact && c.impact !== f.impact) return false;
+  if (skip !== 'imp' && f.imp && c.imp !== f.imp) return false;
+  if (skip !== 'industry' && f.industry && c.industry !== f.industry) return false;
+  if (skip !== 'source' && f.source && c.source !== f.source) return false;
+  if (skip !== 'follow' && f.follow && c.follow !== f.follow) return false;
+  if (f.onlyNew && !(c.isNew || c.isUpd)) return false;
+  if (f.kw) {
+    const words = norm(f.kw).split(/\s+/).filter(Boolean);
+    if (!words.every(w => c.text.includes(w))) return false;
+  }
+  return true;
+}
+function sorted(list) {
+  const a = list.slice();
+  const byReg = (x, y) => (y.regKey - x.regKey) || y.id.localeCompare(x.id);
+  if (state.sort === 'occ') {
+    a.sort((x, y) => {
+      if (!x.occKey && y.occKey) return 1;
+      if (x.occKey && !y.occKey) return -1;
+      return (y.occKey - x.occKey) || byReg(x, y);
+    });
+  } else if (state.sort === 'imp') {
+    a.sort((x, y) => (levelRank(x.imp) - levelRank(y.imp)) || (levelRank(x.impact) - levelRank(y.impact)) || byReg(x, y));
+  } else {
+    a.sort(byReg);
+  }
+  return a;
+}
+
+/* ---------- 画面の切替え ---------- */
+function show(name, msg) {
+  ['gate', 'loading', 'error', 'app'].forEach(n => { $('#view-' + n).hidden = (n !== name); });
+  if (name === 'loading') $('#loading-text').textContent = msg || '読み込んでいます…';
+  $('#reload').hidden = !(name === 'app' || name === 'error');
+  $('#signout').hidden = (name === 'gate' || name === 'loading') && !$('#acct').textContent;
+}
+function showError(e) {
+  console.error(e);
+  let msg = (e && e.message) || '原因不明のエラーです。';
+  if (e && e.status === 401) msg = 'OneDrive を読む権限を確認できませんでした。いったん「切替え」を押して、サインインし直してください。';
+  if (e && e.status === 403) msg = 'OneDrive を読む権限がありません。Chokai-Viewer の API のアクセス許可に Files.Read が付いているか確認してください。';
+  $('#error-text').textContent = msg;
+  show('error');
+}
+
+/* ---------- サインイン ---------- */
+let msalApp = null;
+function makeMsal() {
+  if (typeof msal === 'undefined') throw new AppError('サインイン用の部品を読み込めませんでした。ネットワーク設定を確認してください。');
+  return new msal.PublicClientApplication({
+    auth: { clientId: CLIENT_ID, authority: 'https://login.microsoftonline.com/' + TENANT_ID,
+            redirectUri: REDIRECT, postLogoutRedirectUri: REDIRECT, navigateToLoginRequestUrl: false },
+    cache: { cacheLocation: 'sessionStorage' }
+  });
+}
+function activeAccount() { return msalApp.getActiveAccount() || msalApp.getAllAccounts()[0] || null; }
+async function getToken() {
+  const account = activeAccount();
+  try {
+    return (await msalApp.acquireTokenSilent({ scopes: SCOPES, account })).accessToken;
+  } catch (e) {
+    if (e instanceof msal.InteractionRequiredAuthError || /interaction_required|consent_required|login_required/.test(e.errorCode || '')) {
+      await msalApp.acquireTokenRedirect({ scopes: SCOPES, account });
+      return null;
+    }
+    throw e;
+  }
+}
+
+/* ---------- OneDrive から読む（閲覧のみ） ---------- */
+async function graphGet(url, token) {
+  const r = await fetch(url, { headers: { Authorization: 'Bearer ' + token } });
+  if (!r.ok) throw new AppError('OneDrive から情報を取得できませんでした（' + r.status + '）。', r.status);
+  return r.json();
+}
+async function findLatestFile(token) {
+  let url = 'https://graph.microsoft.com/v1.0/me/drive/root:/' + encodeURIComponent(FOLDER) + ':/children?$top=200';
+  const items = [];
+  for (let i = 0; i < 5 && url; i++) {
+    let j;
+    try { j = await graphGet(url, token); }
+    catch (e) { if (e.status === 404) throw new AppError('OneDrive に「' + FOLDER + '」フォルダーが見つかりません。', 404); throw e; }
+    items.push(...(j.value || []));
+    url = j['@odata.nextLink'] || null;
+  }
+  const cand = items.filter(it => it.file && /^(\d{4})(\d{2})(\d{2})_懲戒.*\.xlsx$/.test(it.name));
+  if (!cand.length) throw new AppError('「' + FOLDER + '」フォルダーに、yyyymmdd_懲戒…xlsx の形式のファイルが見つかりません。');
+  cand.sort((a, b) => (b.name.slice(0, 8).localeCompare(a.name.slice(0, 8))) ||
+                      String(b.lastModifiedDateTime).localeCompare(String(a.lastModifiedDateTime)));
+  return cand[0];
+}
+async function downloadFile(item, token) {
+  const dl = item['@microsoft.graph.downloadUrl'];
+  if (dl) {
+    try { const r = await fetch(dl); if (r.ok) return r.arrayBuffer(); } catch (e) { /* 次の方法へ */ }
+  }
+  const r = await fetch('https://graph.microsoft.com/v1.0/me/drive/items/' + encodeURIComponent(item.id) + '/content',
+                        { headers: { Authorization: 'Bearer ' + token } });
+  if (!r.ok) throw new AppError('Excel ファイルを取得できませんでした（' + r.status + '）。', r.status);
+  return r.arrayBuffer();
+}
+function parseWorkbook(buf) {
+  if (typeof XLSX === 'undefined') throw new AppError('Excel 読み取り用の部品を読み込めませんでした。ネットワーク設定を確認してください。');
+  const wb = XLSX.read(buf, { type: 'array', cellDates: true });
+  const ws = wb.Sheets[SHEET] || wb.Sheets[wb.SheetNames[0]];
+  if (!ws) throw new AppError('Excel にシートが見つかりません。');
+  const rows = XLSX.utils.sheet_to_json(ws, { defval: null, raw: true });
+  return rows.filter(r => has(r['管理ID']));
+}
+
+async function load() {
+  try {
+    show('loading', 'OneDrive の最新ファイルを探しています…');
+    const token = await getToken();
+    if (!token) return;
+    const item = await findLatestFile(token);
+    show('loading', item.name + ' を読み込んでいます…');
+    const buf = await downloadFile(item, token);
+    const rows = parseWorkbook(buf);
+    const m = item.name.match(/^(\d{4})(\d{2})(\d{2})/);
+    state.base = m ? (+m[1]) * 10000 + (+m[2]) * 100 + (+m[3]) : 0;
+    state.meta = { name: item.name, at: new Date(), baseText: m ? `${m[1]}/${m[2]}/${m[3]}` : '' };
+    state.cases = rows.map(toCase);
+    markNewUpdated();
+    state.hidden = new Set();
+    resetFilters(false);
+    buildSelects();
+    show('app');
+    render();
+  } catch (e) { showError(e); }
+}
+
+/* ---------- 描画 ---------- */
+function counts(list, key) {
+  const m = new Map();
+  list.forEach(c => m.set(c[key], (m.get(c[key]) || 0) + 1));
+  return m;
+}
+function fillSelect(sel, values, current) {
+  sel.innerHTML = '<option value="">すべて</option>' +
+    values.map(v => `<option value="${esc(v)}"${v === current ? ' selected' : ''}>${esc(v)}</option>`).join('');
+}
+function buildSelects() {
+  const uniq = k => Array.from(new Set(state.cases.map(c => c[k]).filter(Boolean)));
+  const lvl = (a, b) => levelRank(a) - levelRank(b) || a.localeCompare(b);
+  fillSelect($('#f-impact'), uniq('impact').sort(lvl), state.f.impact);
+  fillSelect($('#f-imp'), uniq('imp').sort(lvl), state.f.imp);
+  const ind = Array.from(counts(state.cases, 'industry')).sort((a, b) => b[1] - a[1]).map(x => x[0]);
+  fillSelect($('#f-industry'), ind, state.f.industry);
+  fillSelect($('#f-follow'), uniq('follow').sort(), state.f.follow);
+}
+function resetFilters(redraw) {
+  state.f = { impact: '', imp: '', industry: '', follow: '', kw: '', onlyNew: false, source: '' };
+  state.hidden = new Set();
+  $('#f-kw').value = '';
+  $('#f-new').checked = false;
+  if (redraw !== false) { buildSelects(); render(); }
+}
+
+function renderHeader() {
+  const m = state.meta;
+  $('#meta').textContent = `取り込み ${fmtDayTime(m.at)}（${m.name}）・案件 ${state.cases.length}件・閲覧のみ`;
+  const n = state.cases.filter(c => c.isNew).length;
+  const u = state.cases.filter(c => c.isUpd).length;
+  const on = n + u > 0;
+  $('#alert').classList.toggle('on', on);
+  $('#alert-big').textContent = `新着 ${n}件・更新 ${u}件`;
+  $('#alert-txt').textContent = on
+    ? `最新ファイル（${m.baseText}）で追加・更新された案件があります`
+    : `最新ファイル（${m.baseText}）で追加・更新された案件はありません`;
+  const b = $('#only-new');
+  b.setAttribute('aria-pressed', String(state.f.onlyNew));
+  b.textContent = state.f.onlyNew ? '全件を表示' : '新着・更新だけ表示';
+  $('#f-new').checked = state.f.onlyNew;
+}
+function renderTiles() {
+  const kinds = KUBUN_ORDER.concat(Array.from(new Set(state.cases.map(c => c.kubun))).filter(k => !KUBUN_ORDER.includes(k)));
+  $('#tiles').innerHTML = kinds.map(k => {
+    const list = state.cases.filter(c => c.kubun === k);
+    const hi = list.filter(c => c.imp === '高').length;
+    const im = list.filter(c => c.impact === '高').length;
+    const nw = list.filter(c => c.isNew || c.isUpd).length;
+    const on = !state.hidden.has(k);
+    return `<button type="button" class="tile" data-k="${esc(k)}" aria-pressed="${on}">
+      <div class="k">${esc(k)}</div>
+      <div class="n">${list.length}</div>
+      <div class="s">${on ? '表示中' : '非表示'}${nw ? '・新着/更新 ' + nw : ''}</div>
+      <div class="s">影響度 高 ${im}件・重要度 高 ${hi}件</div>
+    </button>`;
+  }).join('');
+}
+function renderChart(el, key, filterKey, limit) {
+  const base = state.cases.filter(c => passes(c, filterKey));
+  let rows = Array.from(counts(base, key)).sort((a, b) => b[1] - a[1]);
+  const sel = state.f[filterKey];
+  if (limit && rows.length > limit) {
+    const top = rows.slice(0, limit);
+    if (sel && !top.some(r => r[0] === sel)) { const hit = rows.find(r => r[0] === sel); if (hit) top.push(hit); }
+    rows = top;
+  }
+  const max = rows.length ? rows[0][1] : 1;
+  el.innerHTML = rows.length ? rows.map(([name, n]) =>
+    `<button type="button" class="bar" data-key="${filterKey}" data-v="${esc(name)}" aria-pressed="${sel === name}">
+      <span class="l" title="${esc(name)}">${esc(name)}</span>
+      <span class="t"><i style="width:${Math.max(4, Math.round(n / max * 100))}%"></i></span>
+      <span class="v">${n}</span></button>`).join('') : '<p class="hint">該当なし</p>';
+}
+function cardHtml(c) {
+  const r = c.raw;
+  const result = has(r['裁判結果']) && String(r['裁判結果']).trim() !== '該当なし' ? r['裁判結果'] : r['懲戒・処分内容'];
+  const info = [];
+  const day = fmtDay(r['発生日／判決日']);
+  if (day) info.push('発生日／判決日 ' + day);
+  if (has(result)) info.push((has(r['裁判結果']) && result === r['裁判結果'] ? '結果 ' : '処分 ') + String(result).trim());
+  if (has(r['裁判所名'])) info.push(String(r['裁判所名']).trim());
+  info.push('登録 ' + (c.regKey ? dayText(parseDate(r['初回登録日時']) || idDate(c.id)) : '未記載'));
+  return `<div class="card" role="button" tabindex="0" data-id="${esc(c.id)}" data-k="${esc(c.kubun)}">
+    <div class="tags">
+      <span class="tag">${esc(c.kubun)}</span>
+      ${c.isNew ? '<span class="tag new">新着</span>' : ''}${c.isUpd ? '<span class="tag upd">更新</span>' : ''}
+      ${c.impact ? `<span class="chip${c.impact === '高' ? ' hi' : ''}">影響度 ${esc(c.impact)}</span>` : ''}
+      ${c.imp ? `<span class="chip${c.imp === '高' ? ' hi' : ''}">重要度 ${esc(c.imp)}</span>` : ''}
+      ${c.follow && c.follow !== '新規' ? `<span class="chip">${esc(c.follow)}</span>` : ''}
+      <span class="chip plain">${esc(c.industry)}</span>
+    </div>
+    <h3>${esc(c.org)}</h3>
+    <p class="sum">${esc(r['事案概要'] || '')}</p>
+    <div class="info">${info.map(t => `<span>${esc(t)}</span>`).join('')}</div>
+  </div>`;
+}
+function renderList() {
+  const list = sorted(state.cases.filter(c => passes(c)));
+  $('#list-title').textContent = `案件一覧（${list.length}件 / 全${state.cases.length}件）`;
+  $('#list').innerHTML = list.length ? list.map(cardHtml).join('') :
+    '<div class="empty">条件に合う案件がありません。「絞り込みを元に戻す」を押してください。</div>';
+}
+function render() {
+  renderHeader();
+  renderTiles();
+  renderChart($('#chart-industry'), 'industry', 'industry', 10);
+  renderChart($('#chart-source'), 'source', 'source', 0);
+  renderList();
+}
+
+/* ---------- 詳細 ---------- */
+function safeLink(u) {
+  const s = String(u || '').trim();
+  try {
+    const url = new URL(s);
+    if (url.protocol === 'http:' || url.protocol === 'https:') {
+      return `<a href="${esc(url.href)}" target="_blank" rel="noopener noreferrer">${esc(s)}</a>`;
+    }
+  } catch (e) { /* そのまま文字で表示 */ }
+  return esc(s);
+}
+function sec(title, v) { return has(v) ? `<div class="sec"><h4>${esc(title)}</h4><p>${esc(String(v).trim())}</p></div>` : ''; }
+function openDetail(id) {
+  const c = state.cases.find(x => x.id === id);
+  if (!c) return;
+  const r = c.raw;
+  $('#dlg-tags').innerHTML = `<span class="tag" style="background:var(--${c.kubun === '懲戒事例' ? 'brick' : c.kubun === '裁判例・判例' ? 'navy' : 'slate'})">${esc(c.kubun)}</span>` +
+    (c.isNew ? '<span class="tag new">新着</span>' : '') + (c.isUpd ? '<span class="tag upd">更新</span>' : '') +
+    (c.impact ? `<span class="chip${c.impact === '高' ? ' hi' : ''}">影響度 ${esc(c.impact)}</span>` : '') +
+    (c.imp ? `<span class="chip${c.imp === '高' ? ' hi' : ''}">重要度 ${esc(c.imp)}</span>` : '') +
+    (c.follow ? `<span class="chip">${esc(c.follow)}</span>` : '');
+  $('#dlg-title').textContent = c.org;
+
+  const kv = [];
+  const add = (label, html) => { if (html) kv.push(`<dt>${esc(label)}</dt><dd>${html}</dd>`); };
+  add('管理ID', esc(c.id));
+  add('業種', esc(has(r['業種']) ? r['業種'] : ''));
+  add('発生日／判決日', esc(fmtDay(r['発生日／判決日'])));
+  add('公表日', esc(fmtDay(r['公表日'])));
+  add('裁判所名', esc(has(r['裁判所名']) ? r['裁判所名'] : ''));
+  add('事件名／事件番号', esc(has(r['事件名／事件番号']) ? r['事件名／事件番号'] : ''));
+  add('裁判結果', esc(has(r['裁判結果']) ? r['裁判結果'] : ''));
+
+  const src = [];
+  const addS = (label, html) => { if (html) src.push(`<dt>${esc(label)}</dt><dd>${html}</dd>`); };
+  addS('一次／二次情報', esc(has(r['一次／二次情報']) ? r['一次／二次情報'] : ''));
+  addS('情報源名', esc(has(r['情報源名']) ? r['情報源名'] : ''));
+  addS('URL', has(r['URL']) ? safeLink(r['URL']) : '');
+  addS('ステータス', esc(has(r['ステータス']) ? r['ステータス'] : ''));
+  addS('初回登録日時', esc(fmtDayTime(r['初回登録日時'])));
+  addS('最終確認日時', esc(fmtDayTime(r['最終確認日時'])));
+  addS('重複判定キー', esc(has(r['重複判定キー']) ? r['重複判定キー'] : ''));
+
+  const parent = c.parent ? state.cases.find(x => x.id === c.parent) : null;
+  const kids = state.cases.filter(x => x.parent === c.id);
+  let rel = '';
+  if (c.parent || kids.length) {
+    rel = '<div class="sec"><h4>関連する案件</h4><div class="rel">' +
+      (c.parent ? (parent ? `<button type="button" class="linkbtn" data-open="${esc(parent.id)}">元の案件：${esc(parent.org)}（${esc(parent.id)}）</button>` : `<span>元の案件ID：${esc(c.parent)}（一覧にありません）</span>`) : '') +
+      kids.map(k => `<button type="button" class="linkbtn" data-open="${esc(k.id)}">続報：${esc(k.org)}（${esc(k.id)}）</button>`).join('') +
+      '</div></div>';
+  }
+
+  $('#dlg-body').innerHTML =
+    sec('事案概要', r['事案概要']) + sec('問題となった行為', r['問題となった行為']) +
+    sec('懲戒・処分内容', r['懲戒・処分内容']) + sec('主な争点', r['主な争点']) +
+    sec('判断のポイント', r['判断のポイント']) + sec('実務上の参考点', r['実務上の参考点']) +
+    `<div class="sec"><dl class="kv">${kv.join('')}</dl></div>` +
+    `<div class="sec"><h4>情報源・管理情報</h4><dl class="kv">${src.join('')}</dl></div>` +
+    sec('備考', r['備考']) + rel;
+  const dlg = $('#dlg');
+  if (!dlg.open) dlg.showModal();
+  dlg.scrollTop = 0;
+}
+
+/* ---------- 操作 ---------- */
+function bind() {
+  $('#signin').addEventListener('click', () => {
+    msalApp.loginRedirect({ scopes: SCOPES }).catch(showError);
+  });
+  $('#signout').addEventListener('click', () => {
+    const account = activeAccount();
+    msalApp.logoutRedirect({ account, postLogoutRedirectUri: REDIRECT }).catch(showError);
+  });
+  $('#reload').addEventListener('click', load);
+  $('#retry').addEventListener('click', load);
+
+  $('#tiles').addEventListener('click', e => {
+    const b = e.target.closest('.tile'); if (!b) return;
+    const k = b.dataset.k;
+    if (state.hidden.has(k)) state.hidden.delete(k); else state.hidden.add(k);
+    render();
+  });
+  const barClick = e => {
+    const b = e.target.closest('.bar'); if (!b) return;
+    const key = b.dataset.key, v = b.dataset.v;
+    state.f[key] = state.f[key] === v ? '' : v;
+    if (key === 'industry') $('#f-industry').value = state.f.industry;
+    render();
+  };
+  $('#chart-industry').addEventListener('click', barClick);
+  $('#chart-source').addEventListener('click', barClick);
+
+  [['#f-impact', 'impact'], ['#f-imp', 'imp'], ['#f-industry', 'industry'], ['#f-follow', 'follow']].forEach(([s, k]) => {
+    $(s).addEventListener('change', e => { state.f[k] = e.target.value; render(); });
+  });
+  $('#f-kw').addEventListener('input', e => { state.f.kw = e.target.value; render(); });
+  $('#f-new').addEventListener('change', e => { state.f.onlyNew = e.target.checked; render(); });
+  $('#only-new').addEventListener('click', () => { state.f.onlyNew = !state.f.onlyNew; render(); });
+  $('#reset').addEventListener('click', () => resetFilters(true));
+  $('#sort').addEventListener('change', e => { state.sort = e.target.value; renderList(); });
+
+  const list = $('#list');
+  list.addEventListener('click', e => { const c = e.target.closest('.card'); if (c) openDetail(c.dataset.id); });
+  list.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const c = e.target.closest('.card'); if (!c) return;
+    e.preventDefault(); openDetail(c.dataset.id);
+  });
+  $('#dlg-close').addEventListener('click', () => $('#dlg').close());
+  $('#dlg').addEventListener('click', e => { if (e.target === $('#dlg')) $('#dlg').close(); });
+  $('#dlg-body').addEventListener('click', e => {
+    const b = e.target.closest('[data-open]'); if (b) openDetail(b.dataset.open);
+  });
+}
+
+/* ---------- 起動 ---------- */
+async function main() {
+  bind();
+  show('loading', 'サインインを確認しています…');
+  try {
+    msalApp = makeMsal();
+    if (typeof msalApp.initialize === 'function') await msalApp.initialize();
+    const res = await msalApp.handleRedirectPromise();
+    if (res && res.account) msalApp.setActiveAccount(res.account);
+    const acc = activeAccount();
+    if (!acc) { show('gate'); return; }
+    msalApp.setActiveAccount(acc);
+    $('#acct').textContent = acc.username || '';
+    await load();
+  } catch (e) { showError(e); }
+}
+main();
+})();
+</script>
+</body>
+</html>
