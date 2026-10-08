@@ -6,6 +6,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>懲戒・判例モニター</title>
+<link rel="icon" href="kaiko.ico">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
 :root{
   --ink:#1a2433; --muted:#5b6778; --line:#d8dee7; --bg:#f2f4f7; --card:#fff;
@@ -25,7 +27,7 @@ a{color:var(--navy)}
 .wrap{max-width:1180px;margin:0 auto;padding:0 20px}
 .top .wrap{display:flex;align-items:center;gap:16px;min-height:64px;flex-wrap:wrap;padding-top:8px;padding-bottom:8px}
 .brand{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:700;white-space:nowrap}
-.mark{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:8px;background:var(--navy);color:#fff;font-size:18px}
+.mark{width:34px;height:34px;flex:none}
 .meta{color:var(--muted);font-size:13px;flex:1;min-width:220px}
 .acct{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
 .linkbtn{background:none;border:0;padding:2px 4px;color:var(--navy);text-decoration:underline;cursor:pointer}
@@ -127,7 +129,7 @@ dialog::backdrop{background:rgba(20,28,40,.5)}
 <body>
 <header class="top">
   <div class="wrap">
-    <div class="brand"><span class="mark" aria-hidden="true">懲</span>懲戒・判例モニター</div>
+    <div class="brand"><img class="mark" src="kaiko-mark.png" alt="">懲戒・判例モニター</div>
     <div class="meta" id="meta"></div>
     <div class="acct">
       <span id="acct"></span>
