@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="ja">
-<!-- 懲戒・判例モニター（管理者用）。chokai-publish-web.yml により chokai-portal へ自動公開される。データは含まない。 -->
+<!-- 懲戒・判例モニター。chokai-publish-web.yml により chokai-portal へ自動公開される。データは含まない。
+     管理者は Microsoft でサインインして OneDrive の Excel を読む。共有社員は #k=<合言葉> で開き、
+     chokai-daily.yml が公開する chokai-data.enc.json を復号して読む。 -->
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,6 +10,7 @@
 <title>懲戒・判例モニター</title>
 <link rel="icon" href="kaiko.ico">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="懲戒・判例モニター">
 <style>
 :root{
   --ink:#1a2433; --muted:#5b6778; --line:#d8dee7; --bg:#f2f4f7; --card:#fff;
@@ -45,6 +48,10 @@ main.wrap{padding-top:20px;padding-bottom:60px}
 .btn.ghost{background:#fff;color:var(--navy);border:1px solid var(--navy)}
 .btn.ghost:hover{background:#eef3fa}
 .err{border-left:5px solid var(--new);text-align:left}
+.passform{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:0 0 8px}
+.passform input{height:42px;width:260px;max-width:100%;border:1px solid #b9c2cf;border-radius:8px;padding:0 10px;background:#fff}
+.gate-err{color:var(--new);font-weight:700}
+.gate-admin{margin-top:28px;padding-top:16px;border-top:1px solid var(--line)}
 
 .alert{display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:#fff;border:2px solid var(--line);border-radius:var(--radius);padding:14px 20px;margin-bottom:18px}
 .alert.on{border-color:var(--new)}
@@ -143,9 +150,17 @@ dialog::backdrop{background:rgba(20,28,40,.5)}
   <noscript><div class="panel err">この画面は JavaScript が必要です。</div></noscript>
 
   <section id="view-gate" class="center" hidden>
-    <h1>Microsoft アカウントでサインインしてください</h1>
-    <p>サインインすると、OneDrive の「懲戒」フォルダーにある最新の Excel を読み込んで表示します。閲覧のみで、Excel は変更しません。</p>
-    <button class="btn" id="signin" type="button">Microsoft でサインイン</button>
+    <h1>懲戒・判例モニターを開く</h1>
+    <p>共有用のアイコンから開くと、そのまま表示されます。合言葉を入力して開くこともできます。</p>
+    <form class="passform" id="pass-form" autocomplete="off">
+      <input type="password" id="pass" aria-label="合言葉" placeholder="合言葉" required>
+      <button class="btn" type="submit">表示する</button>
+    </form>
+    <p class="gate-err" id="gate-err" hidden></p>
+    <div class="gate-admin">
+      <p>管理者の方は、サインインすると OneDrive の「懲戒」フォルダーにある最新の Excel を読み込んで表示します。閲覧のみで、Excel は変更しません。</p>
+      <button class="btn ghost" id="signin" type="button">Microsoft でサインイン</button>
+    </div>
   </section>
 
   <section id="view-loading" class="center" hidden>
@@ -377,7 +392,7 @@ function show(name, msg) {
   ['gate', 'loading', 'error', 'app'].forEach(n => { $('#view-' + n).hidden = (n !== name); });
   if (name === 'loading') $('#loading-text').textContent = msg || '読み込んでいます…';
   $('#reload').hidden = !(name === 'app' || name === 'error');
-  $('#signout').hidden = (name === 'gate' || name === 'loading') && !$('#acct').textContent;
+  $('#signout').hidden = !!sharedKey || ((name === 'gate' || name === 'loading') && !$('#acct').textContent);
 }
 function showError(e) {
   console.error(e);
@@ -386,6 +401,58 @@ function showError(e) {
   if (e && e.status === 403) msg = 'OneDrive を読む権限がありません。Chokai-Viewer の API のアクセス許可に Files.Read が付いているか確認してください。';
   $('#error-text').textContent = msg;
   show('error');
+}
+
+/* ---------- 共有社員：合言葉で暗号化データを開く ---------- */
+// 共有用のアイコン（デスクトップ・iPhone のホーム画面）は …/#k=<合言葉> で開く。# 以降はサーバーへ送られない。
+let sharedKey = '';
+const Viewer = (() => {
+  const bytes = b64 => Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+  async function load(passphrase) {
+    const r = await fetch(`chokai-data.enc.json?t=${Date.now()}`, { cache: 'no-store' });
+    if (!r.ok) throw new AppError(`データを読み込めませんでした（${r.status}）。時間をおいて開き直してください。`);
+    const enc = await r.json();
+    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(passphrase), 'PBKDF2', false, ['deriveKey']);
+    const key = await crypto.subtle.deriveKey({ name: 'PBKDF2', hash: 'SHA-256', salt: bytes(enc.salt), iterations: enc.iter },
+                                              base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+    let plain;
+    try { plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes(enc.iv) }, key, bytes(enc.data)); }
+    catch (e) { throw new AppError('合言葉が違います。アイコンが古い場合は、管理者から新しい ZIP を受け取ってください。'); }
+    return JSON.parse(new TextDecoder().decode(plain));
+  }
+  function takeKey() {
+    const m = /(?:^#|&)k=([^&]+)/.exec(location.hash);
+    // 合言葉はアドレスに残す（iPhone の「ホーム画面に追加」でアイコンに合言葉を残すため）。
+    return m ? decodeURIComponent(m[1]).trim() : '';
+  }
+  return { load, takeKey };
+})();
+
+async function loadShared() {
+  show('loading', 'データを読み込んでいます…');
+  const data = await Viewer.load(sharedKey);
+  const m = String(data.source_date || '').match(/^(\d{4})\/(\d{2})\/(\d{2})$/);
+  state.base = m ? (+m[1]) * 10000 + (+m[2]) * 100 + (+m[3]) : 0;
+  state.meta = { name: data.source_file || '', at: data.generated_at || '', baseText: data.source_date || '' };
+  state.cases = (data.cases || []).filter(r => has(r['管理ID'])).map(toCase);
+  markNewUpdated();
+  state.hidden = new Set();
+  resetFilters(false);
+  buildSelects();
+  $('#acct').textContent = '共有用（閲覧のみ）';
+  show('app');
+  render();
+}
+async function openShared(passphrase, fromGate) {
+  sharedKey = passphrase;
+  try { await loadShared(); }
+  catch (e) {
+    if (!fromGate) return showError(e);  // 「もう一度読み込む」は同じ合言葉で読み直す
+    sharedKey = '';
+    $('#gate-err').textContent = (e && e.message) || '原因不明のエラーです。';
+    $('#gate-err').hidden = false;
+    show('gate');
+  }
 }
 
 /* ---------- サインイン ---------- */
@@ -655,14 +722,21 @@ function openDetail(id) {
 /* ---------- 操作 ---------- */
 function bind() {
   $('#signin').addEventListener('click', () => {
+    try { msalApp = msalApp || makeMsal(); } catch (e) { return showError(e); }
     msalApp.loginRedirect({ scopes: SCOPES }).catch(showError);
   });
   $('#signout').addEventListener('click', () => {
     const account = activeAccount();
     msalApp.logoutRedirect({ account, postLogoutRedirectUri: REDIRECT }).catch(showError);
   });
-  $('#reload').addEventListener('click', load);
-  $('#retry').addEventListener('click', load);
+  const reload = () => sharedKey ? loadShared().catch(showError) : load();
+  $('#reload').addEventListener('click', reload);
+  $('#retry').addEventListener('click', reload);
+  $('#pass-form').addEventListener('submit', e => {
+    e.preventDefault();
+    $('#gate-err').hidden = true;
+    openShared($('#pass').value.trim(), true);
+  });
 
   $('#tiles').addEventListener('click', e => {
     const b = e.target.closest('.tile'); if (!b) return;
@@ -706,14 +780,17 @@ function bind() {
 /* ---------- 起動 ---------- */
 async function main() {
   bind();
+  const key = Viewer.takeKey();
+  if (key) return openShared(key, false);  // 共有社員：サインインしない
   show('loading', 'サインインを確認しています…');
+  // サインイン用の部品が読み込めなくても、合言葉の入口は使えるようにする。
+  try { msalApp = makeMsal(); } catch (e) { console.error(e); show('gate'); return; }
   try {
-    msalApp = makeMsal();
     if (typeof msalApp.initialize === 'function') await msalApp.initialize();
     const res = await msalApp.handleRedirectPromise();
     if (res && res.account) msalApp.setActiveAccount(res.account);
     const acc = activeAccount();
-    if (!acc) { show('gate'); return; }
+    if (!acc) { show('gate'); return; }  // 合言葉の入力、または管理者のサインイン（自動では移らない）
     msalApp.setActiveAccount(acc);
     $('#acct').textContent = acc.username || '';
     await load();
