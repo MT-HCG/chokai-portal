@@ -138,6 +138,14 @@ dialog::backdrop{background:rgba(20,28,40,.5)}
   .panel{padding:16px 14px}
   .bar{grid-template-columns:110px 1fr 30px}
   .kv{grid-template-columns:1fr}
+  /* iPhone などでは区分の四角を横に3つ並べる（炎上と同じ） */
+  .tiles{grid-template-columns:repeat(3,1fr);gap:8px}
+  .tile{padding:8px 10px;min-width:0}
+  .tile .k{font-size:13px}
+  .tile .n{font-size:26px}
+  .tile .s{font-size:11px;line-height:1.5}
+  .tile .s span{display:block}
+  .tile .s .sep{display:none}
 }
 </style>
 </head>
@@ -603,8 +611,8 @@ function renderTiles() {
     return `<button type="button" class="tile" data-k="${esc(k)}" aria-pressed="${on}">
       <div class="k">${esc(k)}</div>
       <div class="n">${list.length}</div>
-      <div class="s">${on ? '表示中' : '非表示'}${nw ? '・新着/更新 ' + nw : ''}</div>
-      <div class="s">影響度 高 ${im}件・重要度 高 ${hi}件</div>
+      <div class="s"><span>${on ? '表示中' : '非表示'}</span>${nw ? '<span class="sep">・</span><span>新着/更新 ' + nw + '</span>' : ''}</div>
+      <div class="s"><span>影響度 高 ${im}件</span><span class="sep">・</span><span>重要度 高 ${hi}件</span></div>
     </button>`;
   }).join('');
 }
