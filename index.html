@@ -88,6 +88,8 @@ main.wrap{padding-top:20px;padding-bottom:60px}
 
 .charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:28px;margin-top:22px}
 .charts h3{font-size:14px;margin:0 0 8px}
+.chart-hint{margin-top:22px}
+.chart-hint + .charts{margin-top:12px}
 .bar{display:grid;grid-template-columns:150px 1fr 34px;gap:10px;align-items:center;width:100%;background:none;border:0;padding:3px 4px;border-radius:6px;cursor:pointer;text-align:left}
 .bar:hover{background:#f2f5f9}
 .bar[aria-pressed="true"]{background:#e6eefa}
@@ -203,11 +205,11 @@ dialog::backdrop{background:rgba(20,28,40,.5)}
         <div><button class="btn ghost showall" id="show-all" type="button">全て表示</button></div>
       </div>
 
+      <p class="hint chart-hint">棒を押すと、その項目で絞り込みます（もう一度押すと解除）。</p>
       <div class="charts">
         <div><h3>業種別</h3><div id="chart-industry"></div></div>
         <div><h3>情報の種類別（一次／二次）</h3><div id="chart-source"></div></div>
       </div>
-      <p class="hint">棒を押すと、その項目で絞り込みます（もう一度押すと解除）。</p>
     </section>
 
     <section class="panel">
