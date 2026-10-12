@@ -480,7 +480,7 @@ function makeMsal() {
   return new msal.PublicClientApplication({
     auth: { clientId: CLIENT_ID, authority: 'https://login.microsoftonline.com/' + TENANT_ID,
             redirectUri: REDIRECT, postLogoutRedirectUri: REDIRECT, navigateToLoginRequestUrl: false },
-    cache: { cacheLocation: 'sessionStorage' }
+    cache: { cacheLocation: 'localStorage' }  // 炎上と同じ。閉じても残るので、iPhone のホーム画面から開き直してもサインインしたまま
   });
 }
 function activeAccount() { return msalApp.getActiveAccount() || msalApp.getAllAccounts()[0] || null; }
