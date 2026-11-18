@@ -375,7 +375,7 @@ function markNewUpdated() {
 /* ---------- 絞り込み・並び替え ---------- */
 function passes(c, skip) {
   const f = state.f;
-  if (state.hidden.has(c.kubun)) return false;
+  if (skip !== 'kubun' && state.hidden.has(c.kubun)) return false;
   if (skip !== 'impact' && f.impact && c.impact !== f.impact) return false;
   if (skip !== 'imp' && f.imp && c.imp !== f.imp) return false;
   if (skip !== 'industry' && f.industry && c.industry !== f.industry) return false;
@@ -602,8 +602,10 @@ function renderHeader() {
 }
 function renderTiles() {
   const kinds = KUBUN_ORDER.concat(Array.from(new Set(state.cases.map(c => c.kubun))).filter(k => !KUBUN_ORDER.includes(k)));
+  // 区分の四角の件数も、業種・影響度・キーワードなどの絞り込みに合わせる（区分の表示切替だけは除く）
+  const base = state.cases.filter(c => passes(c, 'kubun'));
   $('#tiles').innerHTML = kinds.map(k => {
-    const list = state.cases.filter(c => c.kubun === k);
+    const list = base.filter(c => c.kubun === k);
     const hi = list.filter(c => c.imp === '高').length;
     const im = list.filter(c => c.impact === '高').length;
     const nw = list.filter(c => c.isNew || c.isUpd).length;
